@@ -28,34 +28,44 @@ export function unwrap(wrapped) {
 export class CommandManager {
     constructor() {
         this.commands = [];
+
+        // raw command objects since discord.js requrires we trim the category
+        // before invoking the REST api
+        this.rawCommands = [];
     }
 
     async registerCommands(clientId, token) {    
         // not async but eh
-        let files = glob.sync('./src/commands/**/*.js', {});
-        console.log(files);
-
-        for (const file of files) {
-            const command = require(`.${file}`);
-
-            console.log(command.instance);
-            this.commands.push(new CommandWrapper(
-                command.instance.getBuilder().toJSON(),
-                command.instance.handler));
-        }
-
-        const rest = new REST({ version: '9' }).setToken(token);
-        this.rest = rest;
-
         try {
-            const unwrappedCommands = this.commands.map(c => unwrap(c));
-            
-            // TODO: add support for multiple guilds
-            await rest.put(Routes.applicationGuildCommands(clientId, process.env.DISCORD_GUILDS), 
-                { body: unwrappedCommands });
-            //await rest.put(Routes.applicationCommands(clientId), { body: commands });
+            let files = glob.sync('./src/commands/**/*.js', {});
+
+            for (const file of files) {
+                const command = require(`.${file}`);
+
+                console.log(command.instance);
+
+                this.rawCommands.push(command.instance);
+                this.commands.push(new CommandWrapper(
+                    command.instance.getBuilder().toJSON(),
+                    command.instance.handler));
+            }
+
+            const rest = new REST({ version: '9' }).setToken(token);
+            this.rest = rest;
+
+            try {
+                const unwrappedCommands = this.commands.map(c => unwrap(c));
+                
+                // TODO: add support for multiple guilds
+                await rest.put(Routes.applicationGuildCommands(clientId, process.env.DISCORD_GUILDS), 
+                    { body: unwrappedCommands });
+                //await rest.put(Routes.applicationCommands(clientId), { body: commands });
+            } catch (error) {
+                console.error(error);
+            }
         } catch (error) {
-            console.error(error);
+            console.log(error);
+            console.log('failed to load module, probably not a command lol');
         }
     }
 

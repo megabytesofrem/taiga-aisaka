@@ -5,7 +5,7 @@ import { Command } from '../../framework/command';
 
 
 function findCommand(instance, name) {
-    return instance.manager.commands.filter(c => c.data.name == name);
+    return instance.manager.rawCommands.filter(c => c.name == name);
 }
 
 export class HelpCommand extends Command {
@@ -26,19 +26,21 @@ export class HelpCommand extends Command {
         const instance = client.instance;
         const cmd = interaction.options.getString('command');
 
-        console.log('CMD IS ' + cmd);
         console.log(findCommand(instance, cmd));
 
         if (findCommand(instance, cmd).length > 0) {
             let match = findCommand(instance, cmd)[0];
-            let options = match.data.options;
+            let options = match._builder.options;
 
-            let usage = `${match.data.name} `;
+            let usage = `${match.name} `;
+
+            console.log(match)
 
             const embed = new MessageEmbed()
                 .setTitle(cmd + '')
                 .setColor(0xff9696)
-                .addField('Description', match.data.description, false);
+                .addField('Category', match.category, false)
+                .addField('Description', match.desc, false);
 
             options.map(opt => {
                 usage += opt.required ? `<${opt.name}>` : `[${opt.name}}`;

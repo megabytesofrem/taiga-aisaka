@@ -2,10 +2,9 @@ import { MessageEmbed } from 'discord.js';
 
 import { SlashCommandBuilder } from '@discordjs/builders';
 import { Command } from '../../framework/command';
+import { VM } from 'vm2';
 
-function write(str) {
-    return str;
-}
+import { makeSandbox } from '../../framework/sandbox';
 
 export class EvalCommand extends Command {
     constructor(name, category, desc) {
@@ -25,8 +24,15 @@ export class EvalCommand extends Command {
         const instance = client.instance;
         const code = interaction.options.getString('code');
 
+        let sandbox = makeSandbox();
+        const vm = new VM({
+            timeout: 1000,
+            sandbox: sandbox,
+        });
+
         try {
-            const result = eval(code);
+            const result = vm.run(code);
+            console.log(result);
 
             const embed = new MessageEmbed()
                 .setTitle('Eval')

@@ -7,11 +7,15 @@ class Bot {
 
     // internal run method
     async _run(token) {
-        this._bot = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES] });
+        this._bot = new Client({ intents: [
+            Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_VOICE_STATES, Intents.FLAGS.GUILD_MESSAGES,
+            Intents.FLAGS.GUILD_MESSAGE_REACTIONS, Intents.FLAGS.GUILD_BANS, Intents.FLAGS.GUILD_VOICE_STATES
+        ] });
         this._bot.login(token);
 
         // discord js rebinds the context
         this._bot.instance = this;
+        this.queue = []; // queue for music bot
 
         // Register a command manager
         this.manager = new CommandManager();
@@ -28,16 +32,20 @@ class Bot {
     async onReady() {
         console.info('Bot started!');
 
-        this.client.user.setActivity('your feelings | /commands', { type: 'WATCHING' });
+        this.user.setActivity('your feelings | /commands', { type: 'PLAYING' });
     }
 
     async onInteractionCreate(interaction) {
         const instance = this.instance;
         if (!interaction.isCommand()) return;
 
-        const command = await instance.manager.findByName(interaction.commandName);
-        console.info(command)
-        await command.handler(this, interaction);
+        try {
+            const command = await instance.manager.findByName(interaction.commandName);
+            console.info(command)
+            await command.handler(this, interaction);
+        } catch (error) {
+            // fucky wucky
+        }
     }
 
     async onMessageCreate() {
