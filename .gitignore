@@ -1,4 +1,6 @@
-build/
+dist/
+old_src/
 node_modules/
+
 linux_deploy.sh
 win_deploy.ps1

@@ -2,10 +2,9 @@
   "name": "taiga-aisaka-bot",
   "version": "1.0.0",
   "description": "",
-  "main": "src/index.js",
+  "main": "dist/src/main.js",
   "scripts": {
-    "build-babel": "babel src -d build",
-    "start": "npm run build-babel && babel-node -r ./build/index.js",
+    "start": "tsc && node dist/src/main.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
@@ -13,11 +12,12 @@
   "dependencies": {
     "@discordjs/rest": "^0.1.0-canary.0",
     "@discordjs/voice": "^0.6.0",
+    "@types/lodash": "^4.14.175",
     "discord-api-types": "^0.23.1",
     "discord.js": "^13.1.0",
-    "glob": "^7.2.0",
     "got": "^11.8.2",
     "lodash": "^4.17.21",
+    "ts-dedent": "^2.2.0",
     "vm2": "^3.9.3",
     "ytdl": "^1.4.1",
     "ytdl-core-discord": "^1.3.1"
@@ -26,6 +26,10 @@
     "@babel/cli": "^7.15.7",
     "@babel/core": "^7.15.5",
     "@babel/node": "^7.15.4",
-    "@babel/preset-env": "^7.15.6"
+    "@babel/preset-env": "^7.15.6",
+    "@types/glob": "^7.1.4",
+    "glob": "^7.2.0",
+    "tslint": "^6.1.3",
+    "typescript": "^4.4.3"
   }
 }
